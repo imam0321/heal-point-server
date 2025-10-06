@@ -1,14 +1,23 @@
-/* eslint-disable no-console */
 import { Server } from "http";
 import app from "./app";
 import { envVars } from "./app/config/env";
+import { prisma } from "./app/config/db";
 
 let server: Server;
 
+async function connectToDB() {
+  try {
+    await prisma.$connect();
+    console.log("DB Connection successfully")
+  } catch (error) {
+    console.log("DB connection failed")
+    process.exit(1);
+  }
+}
+
 const startServer = async () => {
   try {
-    
-
+    await connectToDB();
     server = app.listen(envVars.PORT, () => {
       console.log(`Server is listening to Port ${envVars.PORT}`);
     });
