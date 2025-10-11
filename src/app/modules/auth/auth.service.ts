@@ -1,8 +1,6 @@
 import { UserStatus } from "@prisma/client";
 import { prisma } from "../../config/db";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { envVars } from "../../config/env";
 import { createUserTokens } from "../../utils/userTokens";
 
 const credentialLogin = async (payload: { email: string, password: string }) => {
@@ -14,7 +12,6 @@ const credentialLogin = async (payload: { email: string, password: string }) => 
   })
 
   const isCorrectPassword = await bcrypt.compare(payload.password, user.password);
-
   if (!isCorrectPassword) {
     throw new Error("Password is incorrect")
   }
@@ -24,15 +21,15 @@ const credentialLogin = async (payload: { email: string, password: string }) => 
     email: user.email,
     role: user.role
   }
-
   const userTokens = createUserTokens(jwtPayload)
 
   return {
     accessToken: userTokens.accessToken,
     refreshToken: userTokens.refreshToken,
   }
-
 }
+
+
 
 
 export const AuthService = {

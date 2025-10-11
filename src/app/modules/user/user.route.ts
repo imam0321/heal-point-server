@@ -5,6 +5,7 @@ import { fileUploader } from "../../helpers/fileUploader";
 
 const router = Router();
 
+router.get("/", UserController.getAllUsers)
 router.post("/create-patient",
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
