@@ -6,7 +6,15 @@ import { envVars } from "../../config/env";
 
 
 const createPatient = async (req: Request) => {
-  if (req.file) {
+  const isUserExist = await prisma.user.findUnique({
+    where: { email: req.body.patient.email }
+  })
+
+  if (isUserExist) {
+    throw new Error("User already exist!")
+  }
+
+  if (req.file && !isUserExist) {
     const uploadResult = await fileUploader.uploadToCloudinary(req.file);
     req.body.patient.profilePhoto = uploadResult?.secure_url
   }
@@ -25,7 +33,6 @@ const createPatient = async (req: Request) => {
       data: req.body.patient
     })
   })
-
 
   return result;
 }

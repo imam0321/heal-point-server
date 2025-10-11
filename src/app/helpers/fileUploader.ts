@@ -1,5 +1,6 @@
 import multer from "multer"
 import path from "path"
+import fs from "fs/promises"
 import { v2 as cloudinary } from "cloudinary"
 import { envVars } from "../config/env"
 
@@ -8,13 +9,12 @@ const storage = multer.diskStorage({
     cb(null, path.join(process.cwd(), "/uploads"))
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix)
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 })
 
 const upload = multer({ storage: storage })
-
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   cloudinary.config({
@@ -23,21 +23,22 @@ const uploadToCloudinary = async (file: Express.Multer.File) => {
     api_secret: envVars.CLOUDINARY.CLOUDINARY_CLOUD_API_SECRET
   });
 
-  const uploadResult = await cloudinary.uploader
-    .upload(
-      file.path, {
+  if (!file?.path) throw new Error("No file path found for upload");
+
+  try {
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "heal-point",
       public_id: file.filename,
-    }
-    )
-    .catch((error) => {
-      console.log(error);
     });
 
-  return uploadResult
-
-}
-
-
+    return result;
+  } catch (error) {
+    console.error("Cloudinary upload failed:", error);
+    throw new Error("Failed to upload file to Cloudinary");
+  } finally {
+    await fs.unlink(file.path).catch(() => { });
+  }
+};
 
 
 export const fileUploader = {
