@@ -1,5 +1,7 @@
 import { addHours, addMinutes, format } from "date-fns"
 import { prisma } from "../../config/db";
+import { paginationHelper, TOptions } from "../../utils/paginationHelper";
+import { Prisma } from "@prisma/client";
 
 
 const createSchedule = async (payload: any) => {
@@ -47,7 +49,7 @@ const createSchedule = async (payload: any) => {
       if (isScheduleExist) {
         throw new Error("This schedule already exist")
       }
-      
+
       const result = await prisma.schedule.create({
         data: scheduleData
       })
@@ -61,6 +63,57 @@ const createSchedule = async (payload: any) => {
   return schedules;
 }
 
+const getAllScheduleForDoctor = async (params: any, options: TOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
+  const { startDateTime: filterStartDateTime, endDateTime: filterEndDateTime } = params;
+
+  const andConditions: Prisma.ScheduleWhereInput[] = [];
+
+  if (filterStartDateTime && filterEndDateTime) {
+    andConditions.push({
+      AND: [
+        {
+          startDateTime: {
+            gte: filterStartDateTime
+          }
+        },
+        {
+          endDateTime: {
+            lte: filterEndDateTime
+          }
+        }
+      ]
+    })
+  }
+
+  const whereCondition: Prisma.ScheduleWhereInput = andConditions.length > 0 ? {
+    AND: andConditions
+  } : {}
+
+  const result = await prisma.schedule.findMany({
+    where: whereCondition,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder
+    }
+  })
+
+  const total = await prisma.schedule.count({
+    where: whereCondition
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total
+    },
+    data: result
+  };
+}
+
 export const scheduleService = {
-  createSchedule
+  createSchedule,
+  getAllScheduleForDoctor
 }
