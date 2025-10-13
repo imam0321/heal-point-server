@@ -3,12 +3,12 @@ import { prisma } from "../../config/db";
 import bcrypt from "bcryptjs"
 import { fileUploader } from "../../helpers/fileUploader";
 import { envVars } from "../../config/env";
-import { Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Admin, Doctor, Patient, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { paginationHelper, TOptions } from "../../utils/paginationHelper";
-import { userSearchableFields } from "./user.constens";
+import { userSearchableFields } from "./user.constants";
 
 
-const createPatient = async (req: Request) => {
+const createPatient = async (req: Request): Promise<Patient> => {
   const isUserExist = await prisma.user.findUnique({
     where: { email: req.body.patient.email }
   })
@@ -39,6 +39,83 @@ const createPatient = async (req: Request) => {
 
   return result;
 }
+
+const createDoctor = async (req: Request): Promise<Doctor> => {
+  const isUserExist = await prisma.user.findUnique({
+    where: { email: req.body.doctor.email }
+  })
+
+  if (isUserExist) {
+    throw new Error("Doctor already exist!")
+  }
+
+  const file = req.file;
+
+  if (file) {
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
+    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url
+  }
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
+
+  const userData = {
+    email: req.body.doctor.email,
+    password: hashedPassword,
+    role: UserRole.DOCTOR
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    await transactionClient.user.create({
+      data: userData
+    });
+
+    const createdDoctorData = await transactionClient.doctor.create({
+      data: req.body.doctor
+    });
+
+    return createdDoctorData;
+  });
+
+  return result;
+};
+
+const createAdmin = async (req: Request): Promise<Admin> => {
+  const isUserExist = await prisma.user.findUnique({
+    where: { email: req.body.admin.email }
+  })
+
+  if (isUserExist) {
+    throw new Error("Doctor already exist!")
+  }
+
+  const file = req.file;
+
+  if (file) {
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
+    req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
+  }
+
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
+
+  const userData = {
+    email: req.body.admin.email,
+    password: hashedPassword,
+    role: UserRole.ADMIN
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    await transactionClient.user.create({
+      data: userData
+    });
+
+    const createdAdminData = await transactionClient.admin.create({
+      data: req.body.admin
+    });
+
+    return createdAdminData;
+  });
+
+  return result;
+};
 
 const getAllUsers = async (params: any, options: TOptions) => {
   const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
@@ -97,5 +174,7 @@ const getAllUsers = async (params: any, options: TOptions) => {
 
 export const UserService = {
   createPatient,
+  createDoctor,
+  createAdmin,
   getAllUsers
 }
