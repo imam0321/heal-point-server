@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/", ScheduleController.getAllScheduleForDoctor)
 router.post("/", ScheduleController.createSchedule)
+router.delete("/:id", ScheduleController.deleteSchedule)
 
 
 
