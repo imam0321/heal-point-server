@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { scheduleService } from "./schedule.service";
+import { ScheduleService } from "./schedule.service";
 import pick from "../../utils/pick";
+import { JwtPayload } from "jsonwebtoken";
 
 const createSchedule = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const result = await scheduleService.createSchedule(req.body);
+  const result = await ScheduleService.createSchedule(req.body);
 
   sendResponse(res, {
     statusCode: 201,
@@ -16,10 +17,11 @@ const createSchedule = catchAsync(async (req: Request, res: Response, next: Next
 })
 
 const getAllScheduleForDoctor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const filters = pick(req.query, ["startDateTime", "endDateTime"])
-  const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"])
+  const filters = pick(req.query, ["startDateTime", "endDateTime"]);
+  const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+  const decodedToken = req.user as JwtPayload;
 
-  const result = await scheduleService.getAllScheduleForDoctor(filters, options);
+  const result = await ScheduleService.getAllScheduleForDoctor(filters, options, decodedToken.email);
 
   sendResponse(res, {
     statusCode: 201,
@@ -31,7 +33,7 @@ const getAllScheduleForDoctor = catchAsync(async (req: Request, res: Response, n
 })
 
 const deleteSchedule = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const result = await scheduleService.deleteSchedule(req.params.id);
+  const result = await ScheduleService.deleteSchedule(req.params.id);
 
   sendResponse(res, {
     statusCode: 201,
