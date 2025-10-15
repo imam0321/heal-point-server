@@ -4,7 +4,7 @@ import { envVars } from "../config/env";
 import { verifyToken } from "../utils/jwt";
 import { prisma } from "../config/db";
 import { UserStatus } from "@prisma/client";
-import statusCode from "http-status-codes"
+import httpStatus from "http-status-codes"
 import AppError from "../errorHelpers/AppError";
 
 export const checkAuth =
@@ -14,7 +14,7 @@ export const checkAuth =
         const accessToken = req.cookies.accessToken || req.headers.authorization;
 
         if (!accessToken) {
-          throw new AppError(statusCode.NOT_FOUND, "No Token found");
+          throw new AppError(httpStatus.NOT_FOUND, "No Token found");
         }
 
         const verifiedToken = verifyToken(
@@ -25,21 +25,21 @@ export const checkAuth =
         const isUserExist = await prisma.user.findFirst({ where: { email: verifiedToken.email } });
 
         if (!isUserExist) {
-          throw new AppError(statusCode.NOT_FOUND, "User Not Exist!");
+          throw new AppError(httpStatus.NOT_FOUND, "User Not Exist!");
         }
 
         if (isUserExist.status === UserStatus.INACTIVE) {
-          throw new AppError(statusCode.FORBIDDEN,
+          throw new AppError(httpStatus.FORBIDDEN,
             `User ${UserStatus.INACTIVE}!`
           );
         }
 
         if (isUserExist.status === UserStatus.DELETED) {
-          throw new AppError(statusCode.NOT_FOUND, "User is deleted!");
+          throw new AppError(httpStatus.NOT_FOUND, "User is deleted!");
         }
 
         if (!authRoles.includes(verifiedToken.role)) {
-          throw new AppError(statusCode.NOT_ACCEPTABLE,
+          throw new AppError(httpStatus.NOT_ACCEPTABLE,
             "You are not permitted to view this route!!"
           );
         }

@@ -1,5 +1,5 @@
 import { prisma } from "../../config/db";
-import statusCode from "http-status-codes"
+import httpStatus from "http-status-codes"
 import AppError from "../../errorHelpers/AppError";
 
 const createDoctorSchedule = async (email: string, payload: {
@@ -12,7 +12,7 @@ const createDoctorSchedule = async (email: string, payload: {
   })
 
   if (!doctor) {
-    throw new AppError(statusCode.BAD_REQUEST, "Doctor not found")
+    throw new AppError(httpStatus.BAD_REQUEST, "Doctor not found")
   }
 
   const doctorScheduleData = payload.scheduleIds.map(scheduleId => ({

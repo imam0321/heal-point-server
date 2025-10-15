@@ -6,7 +6,7 @@ import { envVars } from "../../config/env";
 import { Admin, Doctor, Patient, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { paginationHelper, TOptions } from "../../utils/paginationHelper";
 import { userSearchableFields } from "./user.constants";
-import statusCode from "http-status-codes"
+import httpStatus from "http-status-codes"
 import AppError from "../../errorHelpers/AppError";
 
 
@@ -16,7 +16,7 @@ const createPatient = async (req: Request): Promise<Patient> => {
   })
 
   if (isUserExist) {
-    throw new AppError(statusCode.BAD_REQUEST, "User already exist!")
+    throw new AppError(httpStatus.BAD_REQUEST, "User already exist!")
   }
 
   if (req.file && !isUserExist) {
@@ -48,7 +48,7 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
   })
 
   if (isUserExist) {
-    throw new AppError(statusCode.BAD_REQUEST, "Doctor already exist!")
+    throw new AppError(httpStatus.BAD_REQUEST, "Doctor already exist!")
   }
 
   const file = req.file;
@@ -86,7 +86,7 @@ const createAdmin = async (req: Request): Promise<Admin> => {
   })
 
   if (isUserExist) {
-    throw new AppError(statusCode.BAD_REQUEST, "Doctor already exist!")
+    throw new AppError(httpStatus.BAD_REQUEST, "Doctor already exist!")
   }
 
   const file = req.file;

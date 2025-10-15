@@ -2,7 +2,7 @@ import { addHours, addMinutes, format } from "date-fns"
 import { prisma } from "../../config/db";
 import { paginationHelper, TOptions } from "../../utils/paginationHelper";
 import { Prisma } from "@prisma/client";
-import statusCode from "http-status-codes"
+import httpStatus from "http-status-codes"
 import AppError from "../../errorHelpers/AppError";
 
 const createSchedule = async (payload: any) => {
@@ -48,7 +48,7 @@ const createSchedule = async (payload: any) => {
       });
 
       if (isScheduleExist) {
-        throw new AppError(statusCode.BAD_REQUEST, "This schedule already exist")
+        throw new AppError(httpStatus.BAD_REQUEST, "This schedule already exist")
       }
 
       const result = await prisma.schedule.create({
