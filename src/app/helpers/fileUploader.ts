@@ -3,6 +3,8 @@ import path from "path"
 import fs from "fs/promises"
 import { v2 as cloudinary } from "cloudinary"
 import { envVars } from "../config/env"
+import AppError from "../errorHelpers/AppError"
+import statusCode from "http-status-codes"
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,7 +25,7 @@ const uploadToCloudinary = async (file: Express.Multer.File) => {
     api_secret: envVars.CLOUDINARY.CLOUDINARY_CLOUD_API_SECRET
   });
 
-  if (!file?.path) throw new Error("No file path found for upload");
+  if (!file?.path) throw new AppError(statusCode.NOT_FOUND, "No file path found for upload");
 
   try {
     const result = await cloudinary.uploader.upload(file.path, {
@@ -34,7 +36,7 @@ const uploadToCloudinary = async (file: Express.Multer.File) => {
     return result;
   } catch (error) {
     console.error("Cloudinary upload failed:", error);
-    throw new Error("Failed to upload file to Cloudinary");
+    throw new AppError(statusCode.BAD_REQUEST, "Failed to upload file to Cloudinary");
   } finally {
     await fs.unlink(file.path).catch(() => { });
   }
