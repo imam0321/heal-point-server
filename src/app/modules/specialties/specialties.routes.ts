@@ -22,4 +22,4 @@ router.delete(
   SpecialtiesController.deleteSpecialty
 );
 
-export const SpecialtiesRoutes = router;
+export const SpecialtiesRouters = router;
