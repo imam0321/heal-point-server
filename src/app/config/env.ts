@@ -18,7 +18,8 @@ interface EnvConfig {
         JWT_ACCESS_EXPIRES: string;
         JWT_REFRESH_SECRET: string;
         JWT_REFRESH_EXPIRES: string;
-    }
+    },
+    OPEN_ROUTER_API_KEY: string
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -35,6 +36,7 @@ const loadEnvVariables = (): EnvConfig => {
         "JWT_ACCESS_EXPIRES",
         "JWT_REFRESH_SECRET",
         "JWT_REFRESH_EXPIRES",
+        "OPEN_ROUTER_API_KEY",
     ];
 
     requiredEnvVariable.forEach((key) => {
@@ -59,9 +61,8 @@ const loadEnvVariables = (): EnvConfig => {
             JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
             JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
             JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
-        }
-
-
+        },
+        OPEN_ROUTER_API_KEY: process.env.OPEN_ROUTER_API_KEY as string,
     };
 };
 

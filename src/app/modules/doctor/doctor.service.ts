@@ -1,8 +1,12 @@
+import httpStatus from 'http-status-codes';
 import { Prisma } from "@prisma/client";
 import { paginationHelper, TOptions } from "../../utils/paginationHelper";
 import { doctorSearchableFields } from "./doctor.constants";
 import { prisma } from "../../config/db";
 import { IDoctorUpdateInput } from './doctor.interface';
+import AppError from "../../errorHelpers/AppError";
+import { openai } from '../../helpers/openRouter';
+import { extractJsonFromMessage } from '../../utils/extractJsonFromMessage';
 
 
 const getAllDoctors = async (params: any, options: TOptions) => {
@@ -132,8 +136,53 @@ const updateDoctor = async (doctorId: string, payload: Partial<IDoctorUpdateInpu
 
 }
 
+const getAISuggestions = async (symptoms: string) => {
+  if (!symptoms) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Symptoms is required")
+  }
+
+  const doctors = await prisma.doctor.findMany({
+    where: { isDeleted: false },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true
+        }
+      }
+    }
+  });
+
+  const prompt = `You are a smart AI medical assistant. A user describes their symptoms. You must suggest which doctors (from the given list) are most suitable.
+
+  Symptoms: ${symptoms}
+
+  Doctors List:
+  ${JSON.stringify(doctors, null, 3)}
+
+  Return your response in JSON format with full individual doctor data
+  `;
+
+  const completion = await openai.chat.completions.create({
+    model: 'tngtech/deepseek-r1t2-chimera:free',
+    messages: [
+      {
+        role: "system",
+        content: "You are an AI assistant for a doctor recommendation system.",
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+  });
+
+  const result = await extractJsonFromMessage(completion.choices[0].message)
+  return result;
+}
+
 
 export const DoctorService = {
   getAllDoctors,
-  updateDoctor
+  updateDoctor,
+  getAISuggestions
 }
