@@ -1,15 +1,13 @@
-import httpStatus from 'http-status-codes';
-import { Doctor, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { paginationHelper, TOptions } from "../../utils/paginationHelper";
 import { doctorSearchableFields } from "./doctor.constants";
 import { prisma } from "../../config/db";
-import AppError from "../../errorHelpers/AppError";
 import { IDoctorUpdateInput } from './doctor.interface';
 
 
 const getAllDoctors = async (params: any, options: TOptions) => {
   const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
-  const { searchTerm, ...filterData } = params;
+  const { searchTerm, specialties, ...filterData } = params;
 
   const andConditions: Prisma.DoctorWhereInput[] = [];
 
@@ -21,6 +19,21 @@ const getAllDoctors = async (params: any, options: TOptions) => {
           mode: "insensitive"
         }
       }))
+    })
+  }
+
+  if (specialties && specialties.length > 0) {
+    andConditions.push({
+      doctorSpecialties: {
+        some: {
+          specialties: {
+            title: {
+              contains: specialties,
+              mode: "insensitive"
+            }
+          }
+        }
+      }
     })
   }
 
@@ -41,6 +54,13 @@ const getAllDoctors = async (params: any, options: TOptions) => {
     take: limit,
     orderBy: {
       [sortBy]: sortOrder
+    },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true
+        }
+      }
     }
   });
 
