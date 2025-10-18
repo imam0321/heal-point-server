@@ -21,6 +21,18 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response, next: NextF
   })
 })
 
+const updateDoctor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const result = await DoctorService.updateDoctor(req.params.id, req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Updated Doctor Successfully",
+    data: result
+  })
+})
+
 export const DoctorController = {
-  getAllDoctors
+  getAllDoctors,
+  updateDoctor
 }
