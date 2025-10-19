@@ -136,6 +136,27 @@ const updateDoctor = async (doctorId: string, payload: Partial<IDoctorUpdateInpu
 
 }
 
+const getDoctorById = async (id: string) => {
+  return await prisma.doctor.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false
+    },
+    include: {
+      doctorSchedules: {
+        include: {
+          schedule: true
+        }
+      },
+      doctorSpecialties: {
+        include: {
+          specialties: true
+        }
+      }
+    }
+  })
+}
+
 const getAISuggestions = async (symptoms: string) => {
   if (!symptoms) {
     throw new AppError(httpStatus.BAD_REQUEST, "Symptoms is required")
@@ -184,5 +205,6 @@ const getAISuggestions = async (symptoms: string) => {
 export const DoctorService = {
   getAllDoctors,
   updateDoctor,
+  getDoctorById,
   getAISuggestions
 }
