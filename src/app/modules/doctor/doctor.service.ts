@@ -5,8 +5,8 @@ import { doctorSearchableFields } from "./doctor.constants";
 import { prisma } from "../../config/db";
 import { IDoctorUpdateInput } from './doctor.interface';
 import AppError from "../../errorHelpers/AppError";
-import { openai } from '../../helpers/openRouter';
 import { extractJsonFromMessage } from '../../utils/extractJsonFromMessage';
+import { openai } from '../../config/openRouter';
 
 
 const getAllDoctors = async (params: any, options: TOptions) => {

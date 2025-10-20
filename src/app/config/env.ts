@@ -20,6 +20,8 @@ interface EnvConfig {
         JWT_REFRESH_EXPIRES: string;
     },
     OPEN_ROUTER_API_KEY: string
+    STRIPE_SECRET_KEY: string
+    STRIPE_WEBHOOK_SECRET: string
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -37,6 +39,8 @@ const loadEnvVariables = (): EnvConfig => {
         "JWT_REFRESH_SECRET",
         "JWT_REFRESH_EXPIRES",
         "OPEN_ROUTER_API_KEY",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
     ];
 
     requiredEnvVariable.forEach((key) => {
@@ -63,6 +67,8 @@ const loadEnvVariables = (): EnvConfig => {
             JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
         },
         OPEN_ROUTER_API_KEY: process.env.OPEN_ROUTER_API_KEY as string,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+        STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
     };
 };
 

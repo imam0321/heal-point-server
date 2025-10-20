@@ -3,6 +3,8 @@ import httpStatus from "http-status-codes"
 import { prisma } from "../../config/db";
 import { v4 as uuidv4 } from "uuid";
 import AppError from "../../errorHelpers/AppError";
+import { stripe } from "../../config/stripe";
+import { envVars } from "../../config/env";
 
 const createAppointment = async (patientEmail: string, payload: Partial<Appointment>) => {
   const patient = await prisma.patient.findUniqueOrThrow({
@@ -57,8 +59,43 @@ const createAppointment = async (patientEmail: string, payload: Partial<Appointm
         isBooked: true
       }
 
+    });
+
+    const transactionId = uuidv4();
+
+    const payment = await tx.payment.create({
+      data: {
+        appointmentId: appointment.id,
+        amount: doctor.appointmentFee,
+        transactionId
+      }
     })
-    return appointment
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      customer_email: patient.email,
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Appointment with ${doctor.name}`
+            },
+            unit_amount: doctor.appointmentFee * 100
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        appointmentId: appointment.id,
+        paymentId: payment.id
+      },
+      success_url: `${envVars.FRONTEND_URL}/success`,
+      cancel_url: `${envVars.FRONTEND_URL}/cancel`,
+    });
+
+    return { appointment, paymentUrl: session.url }
   })
 
 
