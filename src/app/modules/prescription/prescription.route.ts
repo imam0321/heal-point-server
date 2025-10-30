@@ -9,4 +9,4 @@ router.post("/", checkAuth(UserRole.DOCTOR), PrescriptionController.createPrescr
 
 
 
-export const PrescriptionRoutes = router;
+export const PrescriptionRouters = router;

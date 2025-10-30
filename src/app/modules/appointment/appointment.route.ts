@@ -14,4 +14,4 @@ router.get(
 router.patch("/:id", checkAuth(UserRole.DOCTOR, UserRole.ADMIN), AppointmentController.updateAppointment)
 
 
-export const AppointmentRoutes = router;
+export const AppointmentRouters = router;

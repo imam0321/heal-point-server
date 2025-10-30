@@ -5,9 +5,10 @@ import { ScheduleRouters } from "../modules/schedule/schedule.route";
 import { DoctorScheduleRouters } from "../modules/doctorSchedule/doctorSchedule.route";
 import { SpecialtiesRouters } from "../modules/specialties/specialties.routes";
 import { DoctorRouters } from "../modules/doctor/doctor.route";
-import { AppointmentRoutes } from "../modules/appointment/appointment.route";
-import { PrescriptionRoutes } from "../modules/prescription/prescription.route";
+import { AppointmentRouters } from "../modules/appointment/appointment.route";
+import { PrescriptionRouters } from "../modules/prescription/prescription.route";
 import { ReviewRouters } from "../modules/review/review.route";
+import { PatientRoutes } from "../modules/patient/patient.route";
 
 export const router = Router();
 
@@ -33,16 +34,20 @@ const moduleRoutes = [
         route: DoctorRouters
     },
     {
+        path: "/patient",
+        route: PatientRoutes
+    },
+    {
         path: '/specialties',
         route: SpecialtiesRouters
     },
     {
         path: "/appointment",
-        route: AppointmentRoutes
+        route: AppointmentRouters
     },
     {
         path: "/prescription",
-        route: PrescriptionRoutes
+        route: PrescriptionRouters
     },
     {
         path: "/review",

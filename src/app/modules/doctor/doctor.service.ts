@@ -64,7 +64,8 @@ const getAllDoctors = async (params: any, options: TOptions) => {
         include: {
           specialties: true
         }
-      }
+      },
+      reviews: true
     }
   });
 
@@ -152,7 +153,8 @@ const getDoctorById = async (id: string) => {
         include: {
           specialties: true
         }
-      }
+      },
+      reviews: true
     }
   })
 }
