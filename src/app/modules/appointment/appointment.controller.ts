@@ -33,7 +33,22 @@ const getMyAppointment = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const updateAppointment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const userInfo = req.user as JwtPayload;
+  const { id } = req.params;
+  const { appointmentStatus } = req.body
+  const result = AppointmentService.updateAppointment(id, appointmentStatus, userInfo);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Appointment updated successfully!",
+    data: result,
+  })
+})
+
 export const AppointmentController = {
   createAppointment,
-  getMyAppointment
+  getMyAppointment,
+  updateAppointment
 }

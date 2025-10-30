@@ -1,4 +1,4 @@
-import { Appointment, Prisma, UserRole } from "@prisma/client";
+import { Appointment, AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import httpStatus from "http-status-codes"
 import { prisma } from "../../config/db";
 import { v4 as uuidv4 } from "uuid";
@@ -164,7 +164,35 @@ const getMyAppointment = async (user: JwtPayload, filters: any, options: TOption
 
 }
 
+const updateAppointment = async (appointmentId: string, appointmentStatus: AppointmentStatus, userInfo: JwtPayload) => {
+  const appointmentData = await prisma.appointment.findFirstOrThrow({
+    where: {
+      id: appointmentId
+    },
+    include: {
+      doctor: true
+    }
+  })
+
+  if (userInfo.role === UserRole.DOCTOR) {
+    if (!(userInfo.email === appointmentData.doctor.email)) {
+      throw new AppError(httpStatus.BAD_REQUEST, "This is not your appointment")
+    }
+  }
+
+  return await prisma.appointment.update({
+    where: {
+      id: appointmentId
+    },
+    data: {
+      status: appointmentStatus
+    }
+  })
+
+}
+
 export const AppointmentService = {
   createAppointment,
-  getMyAppointment
+  getMyAppointment,
+  updateAppointment
 }
