@@ -8,6 +8,12 @@ import { checkAuth } from "../../utils/checkAuth";
 const router = Router();
 
 router.get("/", UserController.getAllUsers)
+router.get(
+  '/me',
+  checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  UserController.getMyProfile
+)
+
 router.post("/create-patient",
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
@@ -33,8 +39,14 @@ router.post(
     return UserController.createAdmin(req, res, next)
   }
 );
-
-
-
+router.patch(
+  "/update-my-profile",
+  checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  fileUploader.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data)
+    return UserController.updateMyProfile(req, res, next)
+  }
+);
 
 export const UserRouters = router

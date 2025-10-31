@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import { UserService } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import pick from "../../utils/pick";
+import { JwtPayload } from "jsonwebtoken";
 
 
 const createPatient = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -53,6 +54,31 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
   })
 })
 
+const getMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as JwtPayload;
+
+  const result = await UserService.getMyProfile(user);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My profile data fetched!",
+    data: result
+  })
+});
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as JwtPayload;
+  const result = await UserService.updateMyProfile(user, req);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My profile updated!",
+    data: result
+  })
+});
+
 
 
 export const UserController = {
@@ -60,4 +86,6 @@ export const UserController = {
   createDoctor,
   createAdmin,
   getAllUsers,
+  getMyProfile,
+  updateMyProfile
 }
