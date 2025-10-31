@@ -7,6 +7,13 @@ const router = Router();
 
 router.post("/login", AuthController.credentialLogin);
 router.post('/refresh-token', AuthController.getNewAccessToken)
+router.post('/change-password', checkAuth(
+  UserRole.ADMIN,
+  UserRole.DOCTOR,
+  UserRole.PATIENT
+), AuthController.changePassword);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.post('/reset-password', AuthController.resetPassword);
 
 
 export const AuthRouters = router
