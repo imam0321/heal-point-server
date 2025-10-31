@@ -79,6 +79,18 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const { accessToken } = req.cookies;
+  const result = await AuthService.getMe(accessToken);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
+
 
 export const AuthController = {
   credentialLogin,
@@ -86,4 +98,5 @@ export const AuthController = {
   changePassword,
   forgotPassword,
   resetPassword,
+  getMe
 }

@@ -7,6 +7,7 @@ import httpStatus from "http-status-codes"
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 import { sendEmail } from "../../utils/sendEmail";
+import { verifyToken } from "../../utils/jwt";
 
 const credentialLogin = async (payload: { email: string, password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
@@ -141,10 +142,30 @@ const resetPassword = async (decodedToken: JwtPayload, id: string, newPassword: 
   })
 };
 
+const getMe = async (accessToken: string) => {
+  const decodedData = verifyToken(accessToken, envVars.JWT.JWT_ACCESS_SECRET);
+
+  if (typeof decodedData === "string") {
+    throw new Error("Invalid token");
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decodedData.email,
+      status: UserStatus.ACTIVE
+    }
+  });
+
+  const { email, role } = userData;
+
+  return { email, role };
+}
+
 export const AuthService = {
   credentialLogin,
   getNewAccessToken,
   changePassword,
   forgotPassword,
   resetPassword,
+  getMe
 }
