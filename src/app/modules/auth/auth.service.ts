@@ -1,7 +1,7 @@
 import { UserStatus } from "@prisma/client";
 import { prisma } from "../../config/db";
 import bcrypt from "bcryptjs";
-import { createUserTokens } from "../../utils/userTokens";
+import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../utils/userTokens";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes"
 
@@ -31,9 +31,17 @@ const credentialLogin = async (payload: { email: string, password: string }) => 
   }
 }
 
+const getNewAccessToken = async (refreshToken: string) => {
+  const newAccessToken = await createNewAccessTokenWithRefreshToken(
+    refreshToken
+  );
 
-
+  return {
+    accessToken: newAccessToken,
+  };
+};
 
 export const AuthService = {
-  credentialLogin
+  credentialLogin,
+  getNewAccessToken,
 }
