@@ -7,6 +7,7 @@ import { ReviewController } from "./review.controller";
 const router = Router();
 
 router.post("/", checkAuth(UserRole.PATIENT), ReviewController.createReview)
+router.get('/', ReviewController.getAllReviews);
 
 
 export const ReviewRouters = router
