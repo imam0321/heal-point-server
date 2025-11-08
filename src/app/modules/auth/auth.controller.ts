@@ -16,7 +16,7 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
     statusCode: 201,
     success: true,
     message: "Login Successfully",
-    data: result
+    data: null
   })
 })
 

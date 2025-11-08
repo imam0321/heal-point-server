@@ -27,10 +27,11 @@ const credentialLogin = async (payload: { email: string, password: string }) => 
     email: user.email,
     role: user.role
   }
-  createUserTokens(jwtPayload)
+  const tokens = createUserTokens(jwtPayload)
 
   return {
-    needPasswordChange: user?.needPasswordChange
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken
   }
 }
 
