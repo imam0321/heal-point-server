@@ -6,7 +6,10 @@ const createPatientValidationSchema = z.object({
   patient: z.object({
     name: z.string().nonempty("Name is required"),
     email: z.email(),
-    address: z.string().optional(),
+    age: z.number(),
+    gender: z.enum(["MALE", "FEMALE"], {
+      message: "Gender is required",
+    }),
   }),
 })
 

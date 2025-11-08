@@ -31,7 +31,7 @@ const createPatient = async (req: Request): Promise<Patient> => {
     await tx.user.create({
       data: {
         email: req.body.patient.email,
-        password: hashPassword
+        password: hashPassword,
       }
     })
 

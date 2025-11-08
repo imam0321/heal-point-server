@@ -66,6 +66,7 @@ model Patient {
   contactNumber String?
   address       String?
   gender        Gender?
+  age           Int?
   isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
